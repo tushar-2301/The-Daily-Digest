@@ -1,0 +1,19 @@
+# --- Stage 1: fetching ---
+httpx>=0.27.0              # async HTTP client (RSS + HTML fetch, Gemini API calls)
+feedparser>=6.0.11         # RSS/Atom feed parsing
+playwright>=1.44.0         # headless browser for JS-rendered homepages/article pages
+beautifulsoup4>=4.12.0     # HTML parsing/cleaning
+lxml>=5.2.0                # fast parser backend used by BeautifulSoup("lxml")
+
+# --- Retry logic (used across fetch stages) ---
+tenacity>=8.3.0
+
+# --- PDF generation ---
+reportlab>=4.0.0
+
+# Note: Gemini is called via raw HTTPS requests (httpx) in this codebase,
+# not the google-generativeai SDK, so no Google package is required.
+
+# Note: smtplib, email, asyncio, argparse, json, csv, pathlib, dataclasses,
+# logging, re, datetime, typing, urllib.parse are all Python standard
+# library — no install needed.

@@ -1,0 +1,16 @@
+name,country,url,type
+The Economic Times,India,https://b2b.economictimes.indiatimes.com/rss/recentstories,rss
+Mint,India,https://www.livemint.com/rss/markets,rss
+Business Standard,India,https://www.business-standard.com/rss/industry/banking-21703.rss,rss
+The Jakarta Post,Indonesia,https://rss.thejakartapost.com/home,rss
+Bangkok Post,Thailand,https://www.bangkokpost.com/rss/data/business.xml,rss
+The Philippine Star,Philippines,https://www.philstar.com/rss/business,rss
+The Himalayan Times,Nepal,https://www.thehimalayantimes.com/rssFeed/11,rss
+The Times of India,India,https://timesofindia.indiatimes.com/rssfeedstopstories.cms,rss
+The Island,Sri Lanka,https://island.lk/category/business/,html
+The Kathmandu Post,Nepal,https://kathmandupost.com/money,html
+Republica,Nepal,https://myrepublica.nagariknetwork.com/category/economy,html
+The Star,Malaysia,https://www.thestar.com.my/business,html
+Viet Nam News,Vietnam,https://vietnamnews.vn,html
+Philippine Daily Inquirer,Philippines,https://business.inquirer.net,html
+The Daily Star,Bangladesh,https://www.thedailystar.net/business,html
