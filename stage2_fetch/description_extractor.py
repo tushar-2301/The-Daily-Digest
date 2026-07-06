@@ -32,7 +32,9 @@ from html.parser import HTMLParser
 import httpx
 
 from config import Headline, GEMINI_API_KEY2, GEMINI_MODEL
+from stage3_process import rate_limiter
 
+RATE_LIMIT_KEY = "GEMINI_API_KEY2"
 logger = logging.getLogger("news_pipeline.stage2_6.description")
 
 
@@ -113,11 +115,13 @@ def _call_gemini(prompt: str, client: httpx.Client, max_retries: int = 3) -> str
     }
     last_err = None
     for attempt in range(1, max_retries + 1):
+        rate_limiter.wait_for_slot(RATE_LIMIT_KEY, logger=logger)
         try:
             resp = client.post(url, json=payload, headers=headers, timeout=120.0)
             if resp.status_code == 429:
-                wait = 2 ** attempt
-                logger.warning(f"Gemini 429 — backing off {wait}s")
+                rate_limiter.record_429(RATE_LIMIT_KEY, logger=logger)
+                wait = rate_limiter.WINDOW_SECONDS + rate_limiter.BUFFER_SECONDS
+                logger.warning(f"Gemini 429 — backing off a full window ({wait}s)")
                 time.sleep(wait)
                 continue
             resp.raise_for_status()
@@ -126,7 +130,6 @@ def _call_gemini(prompt: str, client: httpx.Client, max_retries: int = 3) -> str
             text  = "".join(p.get("text", "") for p in parts)
             if not text.strip():
                 raise ValueError("Empty response")
-            time.sleep(20)
             return text
         except (httpx.ConnectError, httpx.ReadTimeout, httpx.ConnectTimeout) as e:
             last_err = e
