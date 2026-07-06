@@ -1,0 +1,55 @@
+name: Daily News Pipeline
+
+on:
+  schedule:
+    # Cron is in UTC. 8:00 AM IST = 2:30 AM UTC.
+    - cron: '30 2 * * *'
+  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Playwright browser (Chromium)
+        run: playwright install --with-deps chromium
+
+      - name: Run pipeline
+        env:
+          GEMINI_API_KEY1: ${{ secrets.GEMINI_API_KEY1 }}
+          GEMINI_API_KEY2: ${{ secrets.GEMINI_API_KEY2 }}
+          GEMINI_API_KEY3: ${{ secrets.GEMINI_API_KEY3 }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+        run: python run.py
+
+      - name: Generate PDF digest
+        run: python generate_news_pdf.py
+
+      - name: Email PDF digest
+        env:
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python mailer.py --file output/headlinesss_latest.pdf
+
+      - name: Upload run artifacts (for debugging)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-output-${{ github.run_id }}
+          path: output/
+          retention-days: 14
