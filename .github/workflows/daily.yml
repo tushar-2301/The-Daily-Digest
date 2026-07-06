@@ -37,14 +37,20 @@ jobs:
         run: python run.py
 
       - name: Generate PDF digest
-        run: python generate_news_pdf.py
+        id: gen_pdf
+        run: |
+          python generate_news_pdf.py
+          # Find the PDF just created in output/ and expose its path to later steps
+          PDF_PATH=$(ls -t output/headlines_*.pdf | head -n 1)
+          echo "Generated PDF: $PDF_PATH"
+          echo "pdf_path=$PDF_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Email PDF digest
         env:
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        run: python mailer.py --file output/headlinesss_latest.pdf
+        run: python mailer.py --file "${{ steps.gen_pdf.outputs.pdf_path }}"
 
       - name: Upload run artifacts (for debugging)
         if: always()
